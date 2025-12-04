@@ -3,14 +3,15 @@ name: CD
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
-  IMAGE_NAME: ninaad98/cloudmart-api:latest
-  RESOURCE_GROUP: Student-RG-1884880
-  CONTAINER_GROUP: cloudmart-app
-  LOCATION: canadaeast
-  VNET_NAME: Student-1884880-vnet
-  SUBNET_NAME: app-subnet
+  DOCKER_IMAGE: ninaad98/cloudmart-api:latest
+  AZURE_RESOURCE_GROUP: Student-RG-1884880
+  AZURE_CONTAINER_GROUP: cloudmart-app
+  AZURE_LOCATION: canadaeast
+  AZURE_VNET: Student-1884880-vnet
+  AZURE_SUBNET: app-subnet
 
 jobs:
   build-push-deploy:
@@ -31,33 +32,35 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.DOCKER_IMAGE }}
 
       - name: Azure login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Delete existing container group if it exists, ignore error if not
       - name: Delete existing container group (if any)
         continue-on-error: true
         run: |
           az container delete \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.CONTAINER_GROUP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_CONTAINER_GROUP }} \
             --yes
 
       - name: Deploy to Azure Container Instances
         run: |
           az container create \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.CONTAINER_GROUP }} \
-            --image ${{ env.IMAGE_NAME }} \
-            --location ${{ env.LOCATION }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_CONTAINER_GROUP }} \
+            --image ${{ env.DOCKER_IMAGE }} \
+            --location ${{ env.AZURE_LOCATION }} \
+            --os-type Linux \
+            --cpu 1 \
+            --memory 1.5 \
             --restart-policy Always \
             --ports 80 \
-            --vnet ${{ env.VNET_NAME }} \
-            --subnet ${{ env.SUBNET_NAME }} \
+            --vnet ${{ env.AZURE_VNET }} \
+            --subnet ${{ env.AZURE_SUBNET }} \
             --environment-variables \
               COSMOS_ENDPOINT=${{ secrets.COSMOS_ENDPOINT }} \
               COSMOS_KEY=${{ secrets.COSMOS_KEY }}
