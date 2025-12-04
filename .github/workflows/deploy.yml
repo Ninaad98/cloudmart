@@ -1,4 +1,3 @@
-cat > .github/workflows/deploy.yml << 'EOF'
 name: CD
 
 on:
@@ -12,7 +11,10 @@ env:
   AZURE_CONTAINER_GROUP: cloudmart-app
   AZURE_LOCATION: canadaeast
   AZURE_VNET: Student-1884880-vnet
-  AZURE_SUBNET: app-subnet
+  # ✅ use the real subnet we created earlier
+  AZURE_SUBNET: cloudmart-subnet
+  # optional: DNS label for public URL
+  AZURE_DNS_LABEL: cloudmart-1884880
 
 jobs:
   build-push-deploy:
@@ -60,9 +62,9 @@ jobs:
             --memory 1.5 \
             --restart-policy Always \
             --ports 80 \
+            --dns-name-label ${{ env.AZURE_DNS_LABEL }} \
             --vnet ${{ env.AZURE_VNET }} \
             --subnet ${{ env.AZURE_SUBNET }} \
             --environment-variables \
               COSMOS_ENDPOINT=${{ secrets.COSMOS_ENDPOINT }} \
               COSMOS_KEY=${{ secrets.COSMOS_KEY }}
-EOF
