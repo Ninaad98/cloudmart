@@ -12,8 +12,7 @@ env:
   AZURE_LOCATION: canadaeast
   AZURE_VNET: Student-1884880-vnet
   # ✅ use the real subnet we created earlier
-  AZURE_SUBNET: cloudmart-subnet
-  # optional: DNS label for public URL
+  AZURE_SUBNET: app-subnet  # optional: DNS label for public URL
   AZURE_DNS_LABEL: cloudmart-1884880
 
 jobs:
