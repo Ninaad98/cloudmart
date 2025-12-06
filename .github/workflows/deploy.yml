@@ -11,9 +11,7 @@ env:
   AZURE_CONTAINER_GROUP: cloudmart-app
   AZURE_LOCATION: canadaeast
   AZURE_VNET: Student-1884880-vnet
-  # ✅ use the real subnet we created earlier
-  AZURE_SUBNET: app-subnet  # optional: DNS label for public URL
-  AZURE_DNS_LABEL: cloudmart-1884880
+  AZURE_SUBNET: app-subnet
 
 jobs:
   build-push-deploy:
@@ -61,7 +59,6 @@ jobs:
             --memory 1.5 \
             --restart-policy Always \
             --ports 80 \
-            --dns-name-label ${{ env.AZURE_DNS_LABEL }} \
             --vnet ${{ env.AZURE_VNET }} \
             --subnet ${{ env.AZURE_SUBNET }} \
             --environment-variables \
